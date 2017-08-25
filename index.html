@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<style>
+	   body {
+    background: linear-gradient(transparent 50%, rgba(0,186,0,0.2) 50%), 
+                linear-gradient(90deg, rgba(0,186,0,0.2) 50%, transparent 50%);
+    background-size: 40px 40px;
+    text-align:center;
+   }
+   div{
+   	font-size:1.5em;
+   	margin: 0 auto;
+   	border:2px solid red;
+   	margin-top:5em;
+   	width:312px;
+   	padding: 2em 1em 2em 1em;
+   	background-color:limegreen;
+   	text-align:center;
+   	box-shadow:4px 4px 10px crimson;
+   }
+
+	</style>
+	<script src = "https://code.jquery.com/jquery-3.1.1.js"></script>
+
+	<script>
+  
+  var json, ab, ao, itogi, itogo;
+  $("document").ready(init());
+
+
+
+  function init(){
+  	$.ajax({
+  		type: "GET",
+  		url: "http://university.netology.ru/api/currency",
+  		dataType: "json",
+
+  		success: function (obj){
+  			$("#from").keyup(fromTo);
+        $("#selector1").change(fromTo);
+        $("#selector2").change(fromTo);
+
+
+        $("#to").keyup(ToFrom);
+
+
+          fromTo();
+          //перевод из валюты в валюту
+				function fromTo(){
+					var a = $("#from").val();  //храним введенное число
+  				if(a < 0)
+  				{
+  					alert("Введите корректную сумму");
+  					return;
+  				}          
+
+           	var arr = []; //массив для хранения валют, а также для поиска и определения индекса в объекте JSON
+           	//заполняем массив валютами из объекта JSON
+           	for(var i = 0; i < obj.length; i++)
+           	{
+           		arr.push(obj[i].CharCode);
+           	}
+            arr.push("RUB");   //в массив добавляем валюту рубль
+            
+
+        var valuta1 = $("#selector1").val();  //храним исходную валюту
+        var valuta2 = $("#selector2").val();  //храним нужную валюту
+
+
+        var v1 = $.inArray(valuta1, arr); //поиск индекса исходной валюты
+        var v2 = $.inArray(valuta2, arr); //поиск индекса новой валюты
+
+
+          obj.push(["RUB"]); //в массив добавляем валюту рубль
+          obj[arr.length-1].Value = 1; //в массив добавляем курс рубля
+
+     // перевод из выбранной валюты в рубли
+      function Iz_V_rub(a){
+         ab =  a * obj[v1].Value;
+        return ab;
+      }
+
+      //перевод из рублей в выбранную валюту
+      function Itog(ab){      
+         itogi = ab / obj[v2].Value;
+        return itogi;
+      }
+
+        Iz_V_rub(a);
+        Itog(ab);
+
+         var otvetToFrom = itogi.toFixed(2);
+         $("#to").val(otvetToFrom);
+
+         /*
+          	//заполнение value c ответа от сервера
+         for(var i = 0; i <= obj.length; i++)
+    	{
+       $("select:even option").attr("value", function(i){
+       	return obj[i].CharCode;
+       })
+					}
+       for(var i = 0; i <= obj.length; i++)
+    	{
+       $("select:odd option").attr("value", function(i){
+       	return obj[i].CharCode;
+       })
+     }
+
+             // Заполнения списка валют - рабочая
+       //  for(var i = 0; i < obj.length; i++)
+     //    {
+      //   	$("select:first").append(function(){ return "<option>" + arr[i] + "</option>";});        											
+      //   }
+        */
+  			};
+          //обратный перевод
+        function ToFrom(){
+          o = $("#to").val();  //храним введенное число
+          if(o < 0)
+          {
+            alert("Введите корректную сумму");
+            return;
+          }          
+
+            var arr = []; //массив для хранения валют, а также для поиска и определения индекса в объекте JSON
+            //заполняем массив валютами из объекта JSON
+            for(var i = 0; i < obj.length; i++)
+            {
+              arr.push(obj[i].CharCode);
+            }
+            arr.push("RUB");   //в массив добавляем валюту рубль
+            
+
+        var valuta1 = $("#selector1").val();  //храним исходную валюту
+        var valuta2 = $("#selector2").val();  //храним нужную валюту
+
+
+        var v1 = $.inArray(valuta1, arr); //поиск индекса исходной валюты
+        var v2 = $.inArray(valuta2, arr); //поиск индекса новой валюты
+
+
+          obj.push(["RUB"]); //в массив добавляем валюту рубль
+          obj[arr.length-1].Value = 1; //в массив добавляем курс рубля
+
+     // перевод из выбранной валюты в рубли
+      function Iz_V_rub(o){
+         ao =  o * obj[v1].Value;
+        return ao;
+      }
+
+      //перевод из рублей в выбранную валюту
+      function Itog(ao){      
+         itogo = ao / obj[v2].Value;
+        return itogo;
+      }
+
+        Iz_V_rub(o);
+        Itog(ao);
+
+         var otvetToFrom = itogo.toFixed(2);
+         $("#from").val(otvetToFrom);
+
+        };
+ 
+
+  		},
+
+  		error: function(){
+        alert("Ошибка");
+    }
+ 		
+});
+
+};
+	</script>
+</head>
+<body>
+<div>
+	<span>Исходная валюта</span>
+	<select id = "selector1">
+    <option selected>RUB</option>
+	  <option>AUD</option>
+		<option>AZN</option>
+		<option>GBP</option>
+		<option>AMD</option>
+		<option>BYN</option>
+		<option>BGN</option>
+		<option>BRL</option>
+		<option>HUF</option>
+		<option>DKK</option>
+		<option>USD</option>
+		<option>EUR</option>
+		<option>INR</option>
+		<option>KZT</option>
+		<option>CAD</option>
+		<option>KGS</option>
+		<option>CNY</option>
+		<option>MDL</option>
+		<option>NOK</option>
+		<option>PLN</option>
+		<option>RON</option>
+		<option>ZZZ</option>
+		<option>SGD</option>
+		<option>TJS</option>
+		<option>TRY</option>
+		<option>TMT</option>
+		<option>UZS</option>
+		<option>UAH</option>
+		<option>CZK</option>
+		<option>SEK</option>
+		<option>CHF</option>
+		<option>ZAR</option>
+		<option>KRW</option>
+		<option>JPY</option>
+	</select>
+	<br>
+	<span>Cумма</span>
+	<input id = "from" type = "number" value = "1000"/>
+	<br>
+		<span>Новая валюта</span>
+	<select id = "selector2">
+    <option>RUB</option>
+		<option>AUD</option>
+		<option>AZN</option>
+		<option>GBP</option>
+		<option>AMD</option>
+		<option>BYN</option>
+		<option>BGN</option>
+		<option>BRL</option>
+		<option>HUF</option>
+		<option>DKK</option>
+		<option selected>USD</option>
+		<option>EUR</option>
+		<option>INR</option>
+		<option>KZT</option>
+		<option>CAD</option>
+		<option>KGS</option>
+		<option>CNY</option>
+		<option>MDL</option>
+		<option>NOK</option>
+		<option>PLN</option>
+		<option>RON</option>
+		<option>ZZZ</option>
+		<option>SGD</option>
+		<option>TJS</option>
+		<option>TRY</option>
+		<option>TMT</option>
+		<option>UZS</option>
+		<option>UAH</option>
+		<option>CZK</option>
+		<option>SEK</option>
+		<option>CHF</option>
+		<option>ZAR</option>
+		<option>KRW</option>
+		<option>JPY</option>
+	</select>
+	<br>
+	<span>Cумма (ИТОГ)</span>
+	<input id = "to" type = "number">
+	</div>
+</body>
+</html>
